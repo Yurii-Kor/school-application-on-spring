@@ -1,55 +1,38 @@
 package ua.foxminded.schoolapplication.view;
 
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
 import java.util.Scanner;
 
 @Component
 public class MainMenu {
-
-	@Autowired
 	private MenuActions menuActions;
-
-	@Autowired
 	private Scanner scanner;
+
+	public MainMenu(MenuActions menuActions, Scanner scanner) {
+		this.menuActions = menuActions;
+		this.scanner = scanner;
+	}
 
 	public void start() {
 		while (true) {
 			printMenu();
 
-			switch (scanner.nextLine().trim().toLowerCase()) {
+			String choice = scanner.nextLine().trim().toLowerCase();
 
-			case "a":
-				menuActions.findGroupsByStudentCount();
-				break;
-
-			case "b":
-				menuActions.findStudentsByCourseName();
-				break;
-
-			case "c":
-				menuActions.addNewStudent();
-				break;
-
-			case "d":
-				menuActions.deleteStudentById();
-				break;
-
-			case "e":
-				menuActions.addStudentToCourse();
-				break;
-
-			case "f":
-				menuActions.removeStudentFromCourse();
-				break;
-
-			case "q":
+			switch (choice) {
+			case "a" -> menuActions.findGroupsByStudentCount();
+			case "b" -> menuActions.findStudentsByCourseName();
+			case "c" -> menuActions.addNewStudent();
+			case "d" -> menuActions.deleteStudentById();
+			case "e" -> menuActions.addStudentToCourse();
+			case "f" -> menuActions.removeStudentFromCourse();
+			case "q" -> {
 				System.out.println("Exiting application...");
 				return;
+			}
 
-			default:
-				System.out.println("Invalid choice. Please select a valid option.");
+			default -> System.out.println("Invalid choice. Please select a valid option.");
 			}
 		}
 	}

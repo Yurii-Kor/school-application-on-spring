@@ -1,7 +1,8 @@
 package ua.foxminded.schoolapplication.model.validation;
 
 import org.junit.jupiter.params.ParameterizedTest;
-import org.junit.jupiter.params.provider.CsvSource;
+import org.junit.jupiter.params.provider.Arguments;
+import org.junit.jupiter.params.provider.MethodSource;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 
@@ -9,6 +10,8 @@ import ua.foxminded.schoolapplication.model.dao.exception.ValidationException;
 import ua.foxminded.schoolapplication.model.domain.Student;
 
 import static org.junit.jupiter.api.Assertions.*;
+
+import java.util.stream.Stream;
 
 @SpringBootTest
 class StudentValidatorTest {
@@ -24,33 +27,13 @@ class StudentValidatorTest {
 	static final String INVALID_NAME_WITH_SYMBOL = "Doe!";
 	static final String INVALID_NAME_WITH_SPACE = "John Doe";
 
-	static final String TEST_PATTERN = "firstName: {0}, lastName: {1} | Expected: {2}";
+	static final String STUDENTS_PATTERN = "firstName: {0}, lastName: {1} | Expected: {2}";
 
 	@Autowired
 	private EntityValidator<Student> validator;
 
-	@ParameterizedTest(name = TEST_PATTERN)
-	@CsvSource({
-			// Valid case
-			"'" + VALID_FIRST_NAME + "', '" + VALID_LAST_NAME + "', true",
-
-			// Invalid cases: null in one of the fields
-			"'" + NULL + "', '" + VALID_LAST_NAME + "', false", "'" + VALID_FIRST_NAME + "', '" + NULL + "', false",
-
-			// Invalid cases: empty strings
-			"'" + INVALID_NAME_EMPTY + "', '" + VALID_LAST_NAME + "', false",
-			"'" + VALID_FIRST_NAME + "', '" + INVALID_NAME_EMPTY + "', false",
-
-			// Invalid cases: names that are too short
-			"'" + INVALID_NAME_TOO_SHORT + "', '" + VALID_LAST_NAME + "', false",
-			"'" + VALID_FIRST_NAME + "', '" + INVALID_NAME_TOO_SHORT + "', false",
-
-			// Invalid cases: names containing invalid characters
-			"'" + INVALID_NAME_WITH_DIGIT + "', '" + VALID_LAST_NAME + "', false",
-			"'" + VALID_FIRST_NAME + "', '" + INVALID_NAME_WITH_SYMBOL + "', false",
-			"'" + INVALID_NAME_WITH_SPACE + "', '" + VALID_LAST_NAME + "', false",
-			"'" + VALID_FIRST_NAME + "', '" + INVALID_NAME_WITH_SPACE + "', false" })
-
+	@ParameterizedTest(name = STUDENTS_PATTERN)
+	@MethodSource("provideStudentsForValidation")
 	void validateStudent_ShouldBehaveAsExpected(String firstName, String lastName, boolean shouldPass) {
 		String validatedFirstName = NULL.equals(firstName) ? null : firstName;
 		String validatedLastName = NULL.equals(lastName) ? null : lastName;
@@ -65,5 +48,19 @@ class StudentValidatorTest {
 					() -> validator.validateEntities(student),
 					"Validation should fail for student: " + student);
 		}
+	}
+
+	static Stream<Arguments> provideStudentsForValidation() {
+		return Stream.of(Arguments.of(VALID_FIRST_NAME, VALID_LAST_NAME, true),
+				Arguments.of(NULL, VALID_LAST_NAME, false),
+				Arguments.of(VALID_FIRST_NAME, NULL, false),
+				Arguments.of(INVALID_NAME_EMPTY, VALID_LAST_NAME, false),
+				Arguments.of(VALID_FIRST_NAME, INVALID_NAME_EMPTY, false),
+				Arguments.of(INVALID_NAME_TOO_SHORT, VALID_LAST_NAME, false),
+				Arguments.of(VALID_FIRST_NAME, INVALID_NAME_TOO_SHORT, false),
+				Arguments.of(INVALID_NAME_WITH_DIGIT, VALID_LAST_NAME, false),
+				Arguments.of(VALID_FIRST_NAME, INVALID_NAME_WITH_SYMBOL, false),
+				Arguments.of(INVALID_NAME_WITH_SPACE, VALID_LAST_NAME, false),
+				Arguments.of(VALID_FIRST_NAME, INVALID_NAME_WITH_SPACE, false));
 	}
 }

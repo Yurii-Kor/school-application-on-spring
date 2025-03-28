@@ -5,7 +5,6 @@ import org.slf4j.LoggerFactory;
 import org.springframework.jdbc.core.namedparam.NamedParameterJdbcTemplate;
 import org.springframework.jdbc.core.namedparam.SqlParameterSource;
 import org.springframework.jdbc.core.namedparam.SqlParameterSourceUtils;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.jdbc.core.RowMapper;
 import org.springframework.jdbc.support.GeneratedKeyHolder;
 import org.springframework.jdbc.support.KeyHolder;
@@ -64,20 +63,23 @@ public class CourseDao implements Dao<Course> {
 			DBSchemaConstants.STUDENTS_COURSES_COURSE_ID,
 			DBSchemaConstants.PARAM_COURSE_ID);
 
-	@Autowired
 	private RowMapper<Course> courseRowMapper;
-
-	@Autowired
 	private NamedParameterJdbcTemplate namedJdbcTemplate;
-
-	@Autowired
 	private EntityValidator<Course> courseValidator;
+
+	public CourseDao(RowMapper<Course> courseRowMapper, NamedParameterJdbcTemplate namedJdbcTemplate,
+			EntityValidator<Course> courseValidator) {
+
+		this.courseRowMapper = courseRowMapper;
+		this.namedJdbcTemplate = namedJdbcTemplate;
+		this.courseValidator = courseValidator;
+	}
 
 	@Transactional(readOnly = true)
 	@Override
 	public Optional<Course> findById(Long id) {
 		logger.debug("Searching for course with ID: {}", id);
-		Map<String, Object> params = Collections.singletonMap(DBSchemaConstants.PARAM_COURSE_ID, id);
+		Map<String, Object> params = Map.of(DBSchemaConstants.PARAM_COURSE_ID, id);
 		try {
 			Course course = namedJdbcTemplate.queryForObject(FIND_BY_ID, params, courseRowMapper);
 			logger.info("Course found: {}", course);
@@ -161,7 +163,7 @@ public class CourseDao implements Dao<Course> {
 	@Override
 	public void deleteById(Long id) {
 		logger.debug("Attempting to delete course with ID: {}", id);
-		Map<String, Object> params = Collections.singletonMap(DBSchemaConstants.PARAM_COURSE_ID, id);
+		Map<String, Object> params = Map.of(DBSchemaConstants.PARAM_COURSE_ID, id);
 
 		int deleted = namedJdbcTemplate.update(DELETE_BY_ID, params);
 		if (deleted != 1) {

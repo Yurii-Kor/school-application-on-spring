@@ -18,7 +18,6 @@ import ua.foxminded.schoolapplication.model.dao.exception.ValidationException;
 import ua.foxminded.schoolapplication.model.domain.Group;
 import ua.foxminded.schoolapplication.model.domain.Student;
 
-import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
 
@@ -49,8 +48,7 @@ class GroupDaoTest {
 	@Test
 	@DisplayName("Save and retrieve a group")
 	void saveShouldSaveAndFindGroup() {
-		Group saved = groupDao.save(Collections.singletonList(new Group(DEFAULT_ID, DEFAULT_GROUP_NAME)))
-				.get(GENERATED_INDEX);
+		Group saved = groupDao.save(List.of(new Group(DEFAULT_ID, DEFAULT_GROUP_NAME))).get(GENERATED_INDEX);
 
 		assertNotNull(saved.getGroupId(), "Group ID should not be null after saving");
 		Optional<Group> fetched = groupDao.findById(saved.getGroupId());
@@ -68,8 +66,7 @@ class GroupDaoTest {
 	@Test
 	@DisplayName("Update an existing group")
 	void updateShouldModifyExistingGroup() {
-		Group saved = groupDao.save(Collections.singletonList(new Group(DEFAULT_ID, DEFAULT_GROUP_NAME)))
-				.get(GENERATED_INDEX);
+		Group saved = groupDao.save(List.of(new Group(DEFAULT_ID, DEFAULT_GROUP_NAME))).get(GENERATED_INDEX);
 
 		saved.setGroupName(UPDATED_GROUP_NAME);
 		groupDao.update(saved);
@@ -86,8 +83,7 @@ class GroupDaoTest {
 	@Test
 	@DisplayName("Delete an existing group")
 	void deleteShouldRemoveGroupById() {
-		Group saved = groupDao.save(Collections.singletonList(new Group(DEFAULT_ID, DEFAULT_GROUP_NAME)))
-				.get(GENERATED_INDEX);
+		Group saved = groupDao.save(List.of(new Group(DEFAULT_ID, DEFAULT_GROUP_NAME))).get(GENERATED_INDEX);
 
 		groupDao.deleteById(saved.getGroupId());
 
@@ -106,11 +102,11 @@ class GroupDaoTest {
 				() -> groupDao.save(List.of(group1, group2)),
 				"Expected DuplicateKeyException when saving duplicate group names in one batch");
 
-		Group saved = groupDao.save(Collections.singletonList(group1)).get(GENERATED_INDEX);
+		Group saved = groupDao.save(List.of(group1)).get(GENERATED_INDEX);
 
 		Group duplicate = new Group(DEFAULT_ID, DEFAULT_GROUP_NAME);
 		assertThrows(DuplicateKeyException.class,
-				() -> groupDao.save(Collections.singletonList(duplicate)),
+				() -> groupDao.save(List.of(duplicate)),
 				"Expected DuplicateKeyException when saving a duplicate group name");
 
 		if (saved != null && saved.getGroupId() != null) {
@@ -123,7 +119,7 @@ class GroupDaoTest {
 	@DisplayName("Saving group with null name should throw exception")
 	void saveShouldThrowExceptionIfGroupNameIsNull() {
 		assertThrows(ValidationException.class,
-				() -> groupDao.save(Collections.singletonList(new Group(DEFAULT_ID, UNSAVED_NAME))),
+				() -> groupDao.save(List.of(new Group(DEFAULT_ID, UNSAVED_NAME))),
 				"Expected ValidationException when group name is null");
 	}
 

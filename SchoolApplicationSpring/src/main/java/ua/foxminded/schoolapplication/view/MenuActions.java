@@ -1,6 +1,5 @@
 package ua.foxminded.schoolapplication.view;
 
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.dao.DataAccessException;
 import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.dao.DuplicateKeyException;
@@ -17,12 +16,13 @@ import java.util.Scanner;
 
 @Component
 public class MenuActions {
-
-	@Autowired
 	private ViewDaoService viewDaoService;
-
-	@Autowired
 	private Scanner scanner;
+
+	public MenuActions(ViewDaoService viewDaoService, Scanner scanner) {
+		this.viewDaoService = viewDaoService;
+		this.scanner = scanner;
+	}
 
 	public void findGroupsByStudentCount() {
 		System.out.print("Enter the max number of students: ");

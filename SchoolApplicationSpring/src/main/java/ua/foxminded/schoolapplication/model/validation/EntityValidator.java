@@ -2,7 +2,6 @@ package ua.foxminded.schoolapplication.model.validation;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
 import ua.foxminded.schoolapplication.model.dao.exception.ValidationException;
@@ -13,8 +12,11 @@ import java.lang.reflect.Field;
 public class EntityValidator<T> {
 	private static final Logger logger = LoggerFactory.getLogger(EntityValidator.class);
 
-	@Autowired
 	private FieldStringValidator stringValidator;
+
+	public EntityValidator(FieldStringValidator stringValidator) {
+		this.stringValidator = stringValidator;
+	}
 
 	public void validateEntities(T... entities) throws ValidationException {
 		if (entities == null || entities.length == 0) {
@@ -40,10 +42,10 @@ public class EntityValidator<T> {
 			try {
 				var value = field.get(entity);
 
-				if (value.getClass().equals(Long.class)) {
-					validateLongField((Long) value, field.getName());
-				} else if (value.getClass().equals(String.class)) {
-					validateStringField((String) value, field);
+				if (value instanceof Long longValue) {
+					validateLongField(longValue, field.getName());
+				} else if (value instanceof String stringValue) {
+					validateStringField(stringValue, field);
 				} else {
 					throw new ValidationException("Unexpected field type: " + value.getClass().getSimpleName());
 				}

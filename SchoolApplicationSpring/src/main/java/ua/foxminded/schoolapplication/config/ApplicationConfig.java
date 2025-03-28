@@ -8,18 +8,12 @@ import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.jdbc.core.RowMapper;
 import org.springframework.jdbc.datasource.DataSourceTransactionManager;
 
-import ua.foxminded.schoolapplication.model.dao.CourseDao;
-import ua.foxminded.schoolapplication.model.dao.Dao;
-import ua.foxminded.schoolapplication.model.dao.GroupDao;
-import ua.foxminded.schoolapplication.model.dao.StudentDao;
 import ua.foxminded.schoolapplication.model.dao.constants.DBSchemaConstants;
 import ua.foxminded.schoolapplication.model.dao.exception.PostgreSQLErrorCodeTranslator;
 import ua.foxminded.schoolapplication.model.domain.Course;
 import ua.foxminded.schoolapplication.model.domain.Group;
 import ua.foxminded.schoolapplication.model.domain.Student;
 
-import java.util.HashMap;
-import java.util.Map;
 import java.util.Scanner;
 
 import javax.sql.DataSource;
@@ -62,15 +56,6 @@ public class ApplicationConfig {
 	public RowMapper<Group> groupRowMapper() {
 		return (rs, rowNum) -> new Group(rs.getLong(DBSchemaConstants.GROUP_ID),
 				rs.getString(DBSchemaConstants.GROUP_NAME));
-	}
-
-	@Bean
-	public Map<Class<?>, Dao<?>> daoRegistry(CourseDao courseDao, StudentDao studentDao, GroupDao groupDao) {
-		Map<Class<?>, Dao<?>> registry = new HashMap<>();
-		registry.put(CourseDao.class, courseDao);
-		registry.put(StudentDao.class, studentDao);
-		registry.put(GroupDao.class, groupDao);
-		return registry;
 	}
 
 	@Bean

@@ -5,7 +5,6 @@ import org.slf4j.LoggerFactory;
 import org.springframework.jdbc.core.namedparam.NamedParameterJdbcTemplate;
 import org.springframework.jdbc.core.namedparam.SqlParameterSource;
 import org.springframework.jdbc.core.namedparam.SqlParameterSourceUtils;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.jdbc.core.RowMapper;
 import org.springframework.stereotype.Repository;
 import org.springframework.transaction.annotation.Transactional;
@@ -64,21 +63,23 @@ public class GroupDao implements Dao<Group> {
 			DBSchemaConstants.GROUP_ID,
 			DBSchemaConstants.PARAM_GROUP_ID);
 
-	@Autowired
 	private RowMapper<Group> groupRowMapper;
-
-	@Autowired
 	private NamedParameterJdbcTemplate namedJdbcTemplate;
-
-	@Autowired
 	private EntityValidator<Group> groupValidator;
+
+	public GroupDao(RowMapper<Group> groupRowMapper, NamedParameterJdbcTemplate namedJdbcTemplate,
+			EntityValidator<Group> groupValidator) {
+
+		this.groupRowMapper = groupRowMapper;
+		this.namedJdbcTemplate = namedJdbcTemplate;
+		this.groupValidator = groupValidator;
+	}
 
 	@Transactional(readOnly = true)
 	@Override
 	public Optional<Group> findById(Long id) {
 		logger.debug("Searching for group with ID: {}", id);
-		Map<String, Object> params = new HashMap<>();
-		params.put(DBSchemaConstants.PARAM_GROUP_ID, id);
+		Map<String, Object> params = Map.of(DBSchemaConstants.PARAM_GROUP_ID, id);
 		try {
 			Group group = namedJdbcTemplate.queryForObject(FIND_BY_ID, params, groupRowMapper);
 			logger.info("Group found: {}", group);
@@ -92,7 +93,7 @@ public class GroupDao implements Dao<Group> {
 	@Transactional(readOnly = true)
 	public List<Group> findGroupsWithStudentCountLessOrEqual(int maxCount) {
 		logger.debug("Finding groups with student count <= {}", maxCount);
-		Map<String, Object> params = Collections.singletonMap(DBSchemaConstants.PARAM_MAX_COUNT, maxCount);
+		Map<String, Object> params = Map.of(DBSchemaConstants.PARAM_MAX_COUNT, maxCount);
 
 		List<Group> groups = namedJdbcTemplate
 				.query(FIND_GROUPS_WITH_STUDENT_COUNT_LESS_OR_EQUAL, params, groupRowMapper);
@@ -157,8 +158,7 @@ public class GroupDao implements Dao<Group> {
 	@Override
 	public void deleteById(Long id) {
 		logger.debug("Attempting to delete group with ID: {}", id);
-		Map<String, Object> params = new HashMap<>();
-		params.put(DBSchemaConstants.PARAM_GROUP_ID, id);
+		Map<String, Object> params = Map.of(DBSchemaConstants.PARAM_GROUP_ID, id);
 
 		int deleted = namedJdbcTemplate.update(DELETE_BY_ID, params);
 		if (deleted != 1) {

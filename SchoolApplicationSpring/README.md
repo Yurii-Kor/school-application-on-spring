@@ -19,7 +19,7 @@ The project is fully containerized using Docker and Docker Compose.
 
 ### 🔧 Available Commands
 
-- `.un.ps1`  
+- `.\run.ps1`  
   Builds the application JAR, starts the PostgreSQL container, and runs the app container interactively.
 
 - `docker-compose down`  

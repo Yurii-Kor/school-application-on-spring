@@ -1,7 +1,7 @@
 package ua.foxminded.schoolapplication.model.validation;
 
 import org.junit.jupiter.params.ParameterizedTest;
-import org.junit.jupiter.params.provider.CsvSource;
+import org.junit.jupiter.params.provider.MethodSource;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 
@@ -9,6 +9,9 @@ import ua.foxminded.schoolapplication.model.dao.exception.ValidationException;
 import ua.foxminded.schoolapplication.model.domain.Group;
 
 import static org.junit.jupiter.api.Assertions.*;
+
+import java.util.stream.Stream;
+import org.junit.jupiter.params.provider.Arguments;
 
 @SpringBootTest
 class GroupValidatorTest {
@@ -25,19 +28,13 @@ class GroupValidatorTest {
 	static final String INVALID_GROUP_NAME_HYPHEN_WITHOUT_LETTERS = "-12";
 	static final String INVALID_GROUP_NAME_ADDITIONAL_SYMBOLS = "AB-12-34";
 
-	static final String TEST_PATTERN = "GroupName: {0} | Expected: {1}";
+	static final String GROUP_PATTERN = "GroupName: {0} | Expected: {1}";
 
 	@Autowired
 	private EntityValidator<Group> validator;
 
-	@ParameterizedTest(name = TEST_PATTERN)
-	@CsvSource({ "'" + VALID_GROUP_NAME_SIMPLE + "', true", "'" + VALID_GROUP_NAME_LONG + "', true",
-
-			"'" + INVALID_GROUP_NAME_NO_HYPHEN + "', false",
-			"'" + INVALID_GROUP_NAME_NON_DIGIT_AFTER_HYPHEN + "', false", "'" + INVALID_GROUP_NAME_EMPTY + "', false",
-			"'" + NULL + "', false", "'" + INVALID_GROUP_NAME_HYPHEN_WITHOUT_DIGITS + "', false",
-			"'" + INVALID_GROUP_NAME_HYPHEN_WITHOUT_LETTERS + "', false",
-			"'" + INVALID_GROUP_NAME_ADDITIONAL_SYMBOLS + "', false" })
+	@ParameterizedTest(name = GROUP_PATTERN)
+	@MethodSource("provideGroupsForValidation")
 	void validate_GroupName_ShouldBehaveAsExpected(String groupName, boolean shouldPass) {
 		Group testedGroup = NULL.equals(groupName) ? new Group(DEFAULT_ID, null) : new Group(DEFAULT_ID, groupName);
 
@@ -49,5 +46,17 @@ class GroupValidatorTest {
 					() -> validator.validateEntities(testedGroup),
 					"Validation should fail for groupName: " + groupName);
 		}
+	}
+
+	static Stream<Arguments> provideGroupsForValidation() {
+		return Stream.of(Arguments.of(VALID_GROUP_NAME_SIMPLE, true),
+				Arguments.of(VALID_GROUP_NAME_LONG, true),
+				Arguments.of(INVALID_GROUP_NAME_NO_HYPHEN, false),
+				Arguments.of(INVALID_GROUP_NAME_NON_DIGIT_AFTER_HYPHEN, false),
+				Arguments.of(INVALID_GROUP_NAME_EMPTY, false),
+				Arguments.of(NULL, false),
+				Arguments.of(INVALID_GROUP_NAME_HYPHEN_WITHOUT_DIGITS, false),
+				Arguments.of(INVALID_GROUP_NAME_HYPHEN_WITHOUT_LETTERS, false),
+				Arguments.of(INVALID_GROUP_NAME_ADDITIONAL_SYMBOLS, false));
 	}
 }

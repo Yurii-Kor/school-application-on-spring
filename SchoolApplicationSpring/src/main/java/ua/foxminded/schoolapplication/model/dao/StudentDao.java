@@ -5,7 +5,6 @@ import org.slf4j.LoggerFactory;
 import org.springframework.jdbc.core.namedparam.NamedParameterJdbcTemplate;
 import org.springframework.jdbc.core.namedparam.SqlParameterSource;
 import org.springframework.jdbc.core.namedparam.SqlParameterSourceUtils;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.jdbc.core.RowMapper;
 import org.springframework.jdbc.support.GeneratedKeyHolder;
 import org.springframework.jdbc.support.KeyHolder;
@@ -77,20 +76,23 @@ public class StudentDao implements Dao<Student> {
 			DBSchemaConstants.STUDENT_ID,
 			DBSchemaConstants.PARAM_STUDENT_ID);
 
-	@Autowired
 	private RowMapper<Student> studentRowMapper;
-
-	@Autowired
 	private NamedParameterJdbcTemplate namedJdbcTemplate;
-
-	@Autowired
 	private EntityValidator<Student> studentValidator;
+
+	public StudentDao(RowMapper<Student> studentRowMapper, NamedParameterJdbcTemplate namedJdbcTemplate,
+			EntityValidator<Student> studentValidator) {
+
+		this.studentRowMapper = studentRowMapper;
+		this.namedJdbcTemplate = namedJdbcTemplate;
+		this.studentValidator = studentValidator;
+	}
 
 	@Transactional(readOnly = true)
 	@Override
 	public Optional<Student> findById(Long id) {
 		logger.debug("Searching for student with ID: {}", id);
-		Map<String, Object> params = Collections.singletonMap(DBSchemaConstants.PARAM_STUDENT_ID, id);
+		Map<String, Object> params = Map.of(DBSchemaConstants.PARAM_STUDENT_ID, id);
 		try {
 			Student student = namedJdbcTemplate.queryForObject(FIND_BY_ID, params, studentRowMapper);
 			logger.info("Student found: {}", student);
@@ -105,7 +107,7 @@ public class StudentDao implements Dao<Student> {
 	public List<Student> findByGroupName(String groupName) {
 		logger.debug("Finding students by group name: {}", groupName);
 
-		Map<String, Object> params = Collections.singletonMap(DBSchemaConstants.PARAM_GROUP_NAME, groupName);
+		Map<String, Object> params = Map.of(DBSchemaConstants.PARAM_GROUP_NAME, groupName);
 
 		List<Student> students = namedJdbcTemplate.query(FIND_BY_GROUP_NAME, params, studentRowMapper);
 		logger.info("Found {} students for group '{}'", students.size(), groupName);
@@ -116,7 +118,7 @@ public class StudentDao implements Dao<Student> {
 	public List<Student> findByCourseName(String courseName) {
 		logger.debug("Finding students by course name: {}", courseName);
 
-		Map<String, Object> params = Collections.singletonMap(DBSchemaConstants.PARAM_COURSE_NAME, courseName);
+		Map<String, Object> params = Map.of(DBSchemaConstants.PARAM_COURSE_NAME, courseName);
 
 		List<Student> students = namedJdbcTemplate.query(FIND_BY_COURSE_NAME, params, studentRowMapper);
 		logger.info("Found {} students for course '{}'", students.size(), courseName);
@@ -181,7 +183,7 @@ public class StudentDao implements Dao<Student> {
 	@Override
 	public void deleteById(Long id) {
 		logger.debug("Attempting to delete student with ID: {}", id);
-		Map<String, Object> params = Collections.singletonMap(DBSchemaConstants.PARAM_STUDENT_ID, id);
+		Map<String, Object> params = Map.of(DBSchemaConstants.PARAM_STUDENT_ID, id);
 
 		int deleted = namedJdbcTemplate.update(DELETE_BY_ID, params);
 		if (deleted != 1) {
