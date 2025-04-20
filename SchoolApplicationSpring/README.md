@@ -12,3 +12,24 @@ The application allows you to:
 - ❌ Delete a student by ID
 - 🔗 Assign a student to a course
 - 🔗 Remove a student from a course
+
+## 🐳 Dockerized Deployment
+
+The project is fully containerized using Docker and Docker Compose.
+
+### 🔧 Available Commands
+
+- `.\run.ps1`  
+  Builds the application JAR, starts the PostgreSQL container, and runs the app container interactively.
+
+- `docker-compose down`  
+  Stops all running containers without removing persistent volume data.
+
+- `docker-compose down -v`  
+  Stops all containers and removes volumes (used to reset the PostgreSQL database).
+
+- `docker-compose up --build`  
+  Rebuilds the application image and starts all containers.
+
+- `docker-compose run --rm app`  
+  Runs the app container interactively and removes it after execution (useful for development).
