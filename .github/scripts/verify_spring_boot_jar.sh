@@ -3,14 +3,9 @@
 set -euo pipefail
 
 target_directory="${1:-target}"
-expected_start_class="${
-  2:-ua.foxminded.schoolapplication.SchoolApplicationConsole
-}"
+expected_start_class="${2:-ua.foxminded.schoolapplication.SchoolApplicationConsole}"
 
-expected_application_class="${
-  expected_start_class//./\/
-}.class"
-
+expected_application_class="${expected_start_class//.//}.class"
 expected_application_class="BOOT-INF/classes/${expected_application_class}"
 
 temporary_directory=""
@@ -27,6 +22,11 @@ cleanup() {
 }
 
 trap cleanup EXIT
+
+if [[ ! -d "$target_directory" ]]; then
+  echo "Target directory does not exist: $target_directory"
+  exit 1
+fi
 
 mapfile -t jar_files < <(
   find "$target_directory" \
@@ -57,7 +57,6 @@ if [[ ! -s "$jar_path" ]]; then
 fi
 
 jar_contents_file=$(mktemp)
-
 jar tf "$jar_path" > "$jar_contents_file"
 
 if ! grep -Fxq \
@@ -83,6 +82,7 @@ if [[ ! -f "$manifest_file" ]]; then
   exit 1
 fi
 
+# Remove Windows line endings and unfold wrapped manifest attributes.
 manifest=$(
   tr -d '\r' < "$manifest_file" \
     | sed ':a;N;$!ba;s/\n //g'
