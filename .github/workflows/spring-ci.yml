@@ -1,0 +1,100 @@
+name: Spring School Application CI
+
+on:
+  push:
+    branches:
+      - main
+
+  pull_request:
+    branches:
+      - main
+
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: spring-ci-${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  test:
+    name: Run tests
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+
+    steps:
+      - name: Check out repository
+        uses: actions/checkout@v6
+
+      - name: Set up JDK 17
+        uses: actions/setup-java@v5
+        with:
+          distribution: temurin
+          java-version: "17"
+          cache: maven
+          cache-dependency-path: pom.xml
+
+      - name: Check Docker availability
+        run: docker version
+
+      - name: Run Maven tests
+        run: |
+          ./mvnw \
+            --batch-mode \
+            --no-transfer-progress \
+            clean test
+
+      - name: Publish test summary
+        if: always()
+        run: |
+          python3 .github/scripts/publish_test_summary.py \
+            --title "Spring application test results"
+
+      - name: Upload test reports
+        if: always()
+        uses: actions/upload-artifact@v7
+        with:
+          name: spring-test-reports
+          path: target/surefire-reports/
+          if-no-files-found: warn
+          retention-days: 14
+
+  build:
+    name: Build Spring Boot JAR
+    needs: test
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+
+    steps:
+      - name: Check out repository
+        uses: actions/checkout@v6
+
+      - name: Set up JDK 17
+        uses: actions/setup-java@v5
+        with:
+          distribution: temurin
+          java-version: "17"
+          cache: maven
+          cache-dependency-path: pom.xml
+
+      - name: Package application
+        run: |
+          ./mvnw \
+            --batch-mode \
+            --no-transfer-progress \
+            clean package \
+            -DskipTests
+
+      - name: Verify Spring Boot JAR
+        id: jar
+        run: bash .github/scripts/verify_spring_boot_jar.sh
+
+      - name: Upload Spring Boot JAR
+        uses: actions/upload-artifact@v7
+        with:
+          name: spring-boot-jar
+          path: ${{ steps.jar.outputs.path }}
+          if-no-files-found: error
+          retention-days: 14
