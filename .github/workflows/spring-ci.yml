@@ -118,23 +118,6 @@ jobs:
           name: spring-boot-jar
           path: target
 
-      - name: Verify downloaded JAR
-        shell: bash
-        run: |
-          jar_path="target/SchoolApplicationSpring-0.0.1-SNAPSHOT.jar"
-
-          if [[ ! -s "$jar_path" ]]; then
-            echo "Expected Spring Boot JAR was not downloaded: $jar_path"
-            exit 1
-          fi
-
-          ls -lh "$jar_path"
-
-      - name: Validate Docker Compose
-        env:
-          POSTGRES_PASSWORD: ci-placeholder-password
-        run: docker compose config > /dev/null
-
       - name: Set up Docker Buildx
         uses: docker/setup-buildx-action@v4
 
@@ -151,55 +134,7 @@ jobs:
           cache-from: type=gha
           cache-to: type=gha,mode=max
 
-      - name: Verify Docker image
-        shell: bash
+      - name: Verify Docker image and demo
         run: |
-          docker image inspect "$IMAGE_TAG" > /dev/null
-
-          echo "Built image:"
-          docker image inspect "$IMAGE_TAG" \
-            --format 'ID={{.Id}} Size={{.Size}} Architecture={{.Architecture}}'
-
-          docker run \
-            --rm \
-            --entrypoint java \
-            "$IMAGE_TAG" \
-            -version
-
-          {
-            echo "## Docker image"
-            echo
-            echo "| Property | Value |"
-            echo "|---|---|"
-            echo "| Tag | \`$IMAGE_TAG\` |"
-            echo "| Push | No |"
-            echo "| Java runtime | Verified |"
-          } >> "$GITHUB_STEP_SUMMARY"
-
-      - name: Validate demo Compose
-        env:
-          APP_IMAGE: ${{ env.IMAGE_TAG }}
-        run: docker compose -f compose.demo.yaml config > /dev/null
-
-      - name: Smoke test demo environment
-        env:
-          APP_IMAGE: ${{ env.IMAGE_TAG }}
-        shell: bash
-        run: |
-          printf 'q\n' \
-            | timeout 90s docker compose \
-                -f compose.demo.yaml \
-                run \
-                --rm \
-                -T \
-                app
-
-      - name: Clean up demo environment
-        if: always()
-        env:
-          APP_IMAGE: ${{ env.IMAGE_TAG }}
-        run: |
-          docker compose \
-            -f compose.demo.yaml \
-            down \
-            --remove-orphans
+          bash .github/scripts/verify_docker_demo.sh \
+            "$IMAGE_TAG"
