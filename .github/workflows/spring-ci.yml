@@ -175,3 +175,31 @@ jobs:
             echo "| Push | No |"
             echo "| Java runtime | Verified |"
           } >> "$GITHUB_STEP_SUMMARY"
+
+      - name: Validate demo Compose
+        env:
+          APP_IMAGE: ${{ env.IMAGE_TAG }}
+        run: docker compose -f compose.demo.yaml config > /dev/null
+
+      - name: Smoke test demo environment
+        env:
+          APP_IMAGE: ${{ env.IMAGE_TAG }}
+        shell: bash
+        run: |
+          printf 'q\n' \
+            | timeout 90s docker compose \
+                -f compose.demo.yaml \
+                run \
+                --rm \
+                -T \
+                app
+
+      - name: Clean up demo environment
+        if: always()
+        env:
+          APP_IMAGE: ${{ env.IMAGE_TAG }}
+        run: |
+          docker compose \
+            -f compose.demo.yaml \
+            down \
+            --remove-orphans
