@@ -1,0 +1,51 @@
+name: Publish Docker image
+
+run-name: Prepare release ${{ inputs.version || 'validation' }}
+
+on:
+  pull_request:
+    branches:
+      - main
+    paths:
+      - pom.xml
+      - .github/workflows/publish-docker.yml
+      - .github/scripts/prepare_release_tag.sh
+
+  workflow_dispatch:
+    inputs:
+      version:
+        description: Release version in MAJOR.MINOR.PATCH format
+        required: true
+        type: string
+
+concurrency:
+  group: prepare-release-${{ github.event_name }}-${{ github.ref }}
+  cancel-in-progress: false
+
+jobs:
+  prepare-release:
+    name: Prepare release tag
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+
+    permissions:
+      contents: write
+
+    outputs:
+      release_version: ${{ steps.release.outputs.release_version }}
+      release_tag: ${{ steps.release.outputs.release_tag }}
+      release_sha: ${{ steps.release.outputs.release_sha }}
+      tag_action: ${{ steps.release.outputs.tag_action }}
+      tag_created: ${{ steps.release.outputs.tag_created }}
+
+    steps:
+      - name: Check out repository
+        uses: actions/checkout@v6
+        with:
+          fetch-depth: 0
+
+      - name: Validate release and prepare tag
+        id: release
+        env:
+          REQUESTED_VERSION: ${{ inputs.version || '' }}
+        run: bash .github/scripts/prepare_release_tag.sh
