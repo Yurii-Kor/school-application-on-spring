@@ -102,7 +102,7 @@ if docker buildx imagetools inspect "$version_tag" > /dev/null 2>&1; then
   version_image_id="$(
     docker image inspect "$version_tag" \
       --format '{{.Id}}'
-  )
+  )"
 
   version_action="reused"
 else
