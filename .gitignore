@@ -37,3 +37,7 @@
 ### Operating system ###
 .DS_Store
 Thumbs.db
+
+### Local environment ###
+.env
+.env.*
