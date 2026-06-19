@@ -26,13 +26,46 @@ on:
         required: true
         type: string
 
+permissions:
+  contents: read
+
 concurrency:
-  group: prepare-release-${{ github.event_name }}-${{ github.ref }}
+  group: docker-release-${{ github.event_name }}-${{ github.ref }}
   cancel-in-progress: false
 
 jobs:
+  validate-release:
+    name: Validate release configuration
+    if: github.event_name == 'pull_request'
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+
+    permissions:
+      contents: read
+
+    steps:
+      - name: Check out repository
+        uses: actions/checkout@v6
+        with:
+          fetch-depth: 0
+          persist-credentials: false
+
+      - name: Validate release scripts
+        run: |
+          bash -n .github/scripts/prepare_release_tag.sh
+          bash -n .github/scripts/verify_release_source.sh
+          bash -n .github/scripts/verify_spring_boot_jar.sh
+          bash -n .github/scripts/verify_docker_demo.sh
+          bash -n .github/scripts/publish_docker_image.sh
+
+      - name: Validate release configuration
+        env:
+          REQUESTED_VERSION: ""
+        run: bash .github/scripts/prepare_release_tag.sh
+
   prepare-release:
     name: Prepare release tag
+    if: github.event_name == 'workflow_dispatch'
     runs-on: ubuntu-latest
     timeout-minutes: 5
 
@@ -63,7 +96,7 @@ jobs:
       - name: Validate release and prepare tag
         id: release
         env:
-          REQUESTED_VERSION: ${{ inputs.version || '' }}
+          REQUESTED_VERSION: ${{ inputs.version }}
         run: bash .github/scripts/prepare_release_tag.sh
 
   publish-image:
