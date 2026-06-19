@@ -99,36 +99,189 @@ The PostgreSQL container uses temporary storage in this demo, so its data is rem
 
 This option is intended for development and testing changes made to the source code.
 
+The local startup scripts automatically:
+
+* build the executable Spring Boot JAR;
+* optionally run Maven tests;
+* validate the Docker Compose configuration;
+* build the application Docker image;
+* start PostgreSQL;
+* run the application in interactive console mode.
+
+Maven tests are skipped by default to make repeated local startup faster.
+
 #### Linux or WSL
 
+Make the script executable after cloning the repository:
+
 ```bash
-./mvnw clean package
-docker compose run --rm --build app
+chmod +x run.sh
 ```
+
+##### Standard startup
+
+Build the application without running tests and start the local Docker environment:
+
+```bash
+./run.sh
+```
+
+##### Startup with Maven tests
+
+Run the complete Maven test suite before starting the application:
+
+```bash
+./run.sh --run-tests
+```
+
+##### Startup with a clean database
+
+Remove the existing PostgreSQL container and volume before startup:
+
+```bash
+./run.sh --reset-database
+```
+
+##### Startup with a custom PostgreSQL password
+
+```bash
+./run.sh --postgres-password "my-local-password"
+```
+
+##### Run tests and reset the database
+
+```bash
+./run.sh \
+  --run-tests \
+  --reset-database
+```
+
+##### Reset the database and use a custom password
+
+```bash
+./run.sh \
+  --reset-database \
+  --postgres-password "my-local-password"
+```
+
+##### Use all available startup options
+
+```bash
+./run.sh \
+  --run-tests \
+  --reset-database \
+  --postgres-password "my-local-password"
+```
+
+##### Display the available options
+
+```bash
+./run.sh --help
+```
+
+---
 
 #### Windows PowerShell
 
+PowerShell may prevent local scripts from running because of the current execution policy. The script can be started for the current invocation without permanently changing the system policy:
+
 ```powershell
-.\mvnw.cmd clean package
-docker compose run --rm --build app
+powershell -ExecutionPolicy Bypass -File .\run.ps1
 ```
 
-The first command builds the executable Spring Boot JAR. The second command builds the local application image, starts PostgreSQL, and runs the application interactively.
+If local scripts are already allowed, use the shorter commands below.
 
-After changing the Java source code, rebuild the JAR before rebuilding the Docker image.
+##### Standard startup
+
+Build the application without running tests and start the local Docker environment:
+
+```powershell
+.\run.ps1
+```
+
+##### Startup with Maven tests
+
+Run the complete Maven test suite before starting the application:
+
+```powershell
+.\run.ps1 -RunTests
+```
+
+##### Startup with a clean database
+
+Remove the existing PostgreSQL container and volume before startup:
+
+```powershell
+.\run.ps1 -ResetDatabase
+```
+
+##### Startup with a custom PostgreSQL password
+
+```powershell
+.\run.ps1 -PostgresPassword "my-local-password"
+```
+
+##### Run tests and reset the database
+
+```powershell
+.\run.ps1 `
+  -RunTests `
+  -ResetDatabase
+```
+
+##### Reset the database and use a custom password
+
+```powershell
+.\run.ps1 `
+  -ResetDatabase `
+  -PostgresPassword "my-local-password"
+```
+
+##### Use all available startup options
+
+```powershell
+.\run.ps1 `
+  -RunTests `
+  -ResetDatabase `
+  -PostgresPassword "my-local-password"
+```
+
+The PowerShell options can also be provided on one line:
+
+```powershell
+.\run.ps1 -RunTests -ResetDatabase -PostgresPassword "my-local-password"
+```
 
 ### Local environment management
 
-Stop the local containers while preserving PostgreSQL data:
+After the console application exits, PostgreSQL remains available and its data is preserved for the next startup.
+
+#### Stop the local environment
 
 ```bash
 docker compose down
 ```
 
-Stop the containers and remove the PostgreSQL volume:
+This stops and removes the containers and network while preserving the PostgreSQL volume.
+
+#### Stop the environment and delete the database
 
 ```bash
 docker compose down --volumes
 ```
 
-Use the second command when you need a clean database.
+This also removes the PostgreSQL volume and all locally stored application data.
+
+The same cleanup can be performed automatically during the next startup.
+
+Linux or WSL:
+
+```bash
+./run.sh --reset-database
+```
+
+Windows PowerShell:
+
+```powershell
+.\run.ps1 -ResetDatabase
+```
