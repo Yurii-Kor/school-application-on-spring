@@ -55,7 +55,6 @@ This project keeps SQL queries explicit, but moves application wiring, connectio
 
 </details>
 
-````markdown
 ---
 
 <details open>
