@@ -20,16 +20,43 @@ For background on the Spring JDBC approach, see the Baeldung guide: [Spring JDBC
 
 ---
 
-## 📦 Features
+<details open>
+<summary><h2>Technology Stack</h2></summary>
 
-The application allows you to:
+| Area | Technology |
+|---|---|
+| Language | Java 17 |
+| Build tool | Maven |
+| Application framework | Spring Boot |
+| Persistence | Spring JDBC, `NamedParameterJdbcTemplate` |
+| Database | PostgreSQL |
+| Connection pooling | HikariCP |
+| Database migrations | Flyway |
+| Testing | JUnit 5, Mockito, Spring Test, Testcontainers |
+| Containerization | Docker, Docker Compose |
+| CI/CD | GitHub Actions, Docker Hub release workflow |
 
-- 🔍 Find all groups with a student count less than or equal to a given number
-- 📚 List all students enrolled in a course by its name
-- ➕ Add a new student
-- ❌ Delete a student by ID
-- 🔗 Assign a student to a course
-- 🔗 Remove a student from a course
+This project keeps SQL queries explicit, but moves application wiring, connection management, transaction boundaries, and database exception handling into the Spring ecosystem.
+
+</details>
+
+<details>
+<summary><h2>Features</h2></summary>
+
+The service and DAO layers support the core school-management operations for groups, students, courses, and student-course enrollments.
+
+The console UI exposes the following user-facing actions:
+
+- Find all groups with a student count less than or equal to a given number.
+- List all students enrolled in a course by course name.
+- Add a new student.
+- Delete a student by student ID.
+- Assign a student to a course.
+- Remove a student from one of their courses.
+
+</details>
+
+---
 
 ## 🐳 Dockerized Deployment
 
