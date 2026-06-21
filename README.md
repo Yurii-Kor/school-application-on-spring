@@ -1,6 +1,24 @@
-# SchoolApplicationSpring
+# School Application Spring
 
-📘 **SchoolApplicationSpring** is a console-based Spring Boot application for managing academic groups, students, and courses. It is built using `Spring`, `JDBC`, `HikariCP` for connection pooling, `PostgreSQL` as the database, and `Flyway` for schema migrations.
+### Java 17 · Spring Boot · Spring JDBC · Version 1.0.0
+
+[![Spring CI](https://github.com/Yurii-Kor/school-application-on-spring/actions/workflows/spring-ci.yml/badge.svg)](https://github.com/Yurii-Kor/school-application-on-spring/actions/workflows/spring-ci.yml)
+![Java](https://img.shields.io/badge/Java-17-orange)
+![Spring Boot](https://img.shields.io/badge/Spring%20Boot-3.4.3-brightgreen)
+![JDBC](https://img.shields.io/badge/Persistence-Spring%20JDBC-blue)
+![Database](https://img.shields.io/badge/Database-PostgreSQL-blue)
+![Docker](https://img.shields.io/badge/Docker-ready-blue)
+![Type](https://img.shields.io/badge/Type-Console%20Application-lightgrey)
+
+Console-based school management application built with Spring Boot, Spring JDBC, PostgreSQL, Flyway, HikariCP, Docker, and GitHub Actions.
+
+This project is the second step in the School Application learning series. Unlike the plain JDBC version, it keeps SQL-based persistence but moves application wiring, transaction management, connection handling, and data access exception translation into the Spring ecosystem.
+
+The persistence layer uses Spring JDBC through `NamedParameterJdbcTemplate`, so SQL queries remain explicit while repetitive low-level JDBC boilerplate is reduced. Spring’s data access exception model is also used through `DataAccessException`, making database-related failures easier to handle consistently.
+
+For background on the Spring JDBC approach, see the Baeldung guide: [Spring JDBC and JdbcTemplate](https://www.baeldung.com/spring-jdbc-jdbctemplate).
+
+---
 
 ## 📦 Features
 
