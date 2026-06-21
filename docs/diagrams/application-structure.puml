@@ -1,0 +1,46 @@
+@startuml
+allowmixing
+
+title School Application Spring - Application Structure Overview
+
+skinparam shadowing false
+skinparam linetype ortho
+skinparam packageStyle rectangle
+skinparam rectangle {
+  RoundCorner 12
+}
+hide stereotype
+
+top to bottom direction
+
+rectangle "Spring Boot Entry Point\n\nSchoolApplicationConsole\n\nStarts the application\nand creates the Spring context" as app
+
+rectangle "Console UI\n\nMainMenu\nMenuActions\n\nReads user input and delegates\nselected menu actions" as ui
+
+rectangle "Service Layer\n\nViewDaoService\n\nCoordinates console actions\nand persistence operations" as service
+
+rectangle "DAO Layer\n\nStudentDao\nCourseDao\nGroupDao\nDao\n\nExecutes SQL queries and maps\ndatabase rows to domain objects" as dao
+
+rectangle "Spring Infrastructure\n\nApplication configuration\nSpring beans\nHikariCP\nFlyway\n\nManages dependencies,\ndatabase connections,\nand migrations" as spring
+
+rectangle "Domain Model\n\nStudent\nGroup\nCourse\n\nRepresents school-management\nentities" as domain
+
+rectangle "Validation\n\nEntityValidator\nFieldStringValidator\nStringValidationParameters\n\nChecks input before\npersistence operations" as validation
+
+database "PostgreSQL\n\nTables:\ngroups\nstudents\ncourses\nstudents_courses" as db
+
+app --> ui : starts
+ui --> service : delegates commands
+service --> dao : calls persistence logic
+dao --> spring : uses configured beans
+spring --> db : JDBC connections
+dao --> domain : maps data
+service --> validation : validates input
+
+note left of service
+This project keeps SQL-based persistence,
+but moves application wiring and infrastructure
+management to the Spring Boot container.
+end note
+
+@enduml
