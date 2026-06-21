@@ -397,3 +397,60 @@ Windows PowerShell:
 ```
 
 </details>
+
+---
+
+<details>
+<summary><strong>Build and Test without Docker</strong></summary>
+
+This section is intended for local development when PostgreSQL is already available and configured for the application.
+
+Run the test suite:
+
+```bash
+./mvnw clean test
+````
+
+Build the executable Spring Boot JAR:
+
+```bash
+./mvnw clean package
+```
+
+Run the packaged application:
+
+```bash
+java -jar target/SchoolApplicationSpring-1.0.0.jar
+```
+
+The application still requires PostgreSQL to be available according to the configured datasource properties. For a fully prepared local environment, prefer the Docker-based startup scripts described above.
+
+</details>
+
+---
+
+## Learning Context and Project Scope
+
+This project is part of a learning series that implements the same school-management domain through progressively higher persistence abstractions:
+
+1. [School Application JDBC](https://github.com/Yurii-Kor/school-application-jdbc) — plain JDBC, SQL, DAO pattern, manual wiring.
+2. [School Application on Spring](https://github.com/Yurii-Kor/school-application-on-spring) — Spring Boot with Spring JDBC infrastructure.
+3. [School Application Hibernate](https://github.com/Yurii-Kor/school-application-hibernate) — Hibernate / JPA persistence layer.
+4. [School Application Spring Data JPA](https://github.com/Yurii-Kor/school-application-spring-data-jpa) — Spring Data JPA repositories.
+
+The goal of the series is to show how the data access layer evolves from manual SQL and JDBC code to repository-based persistence.
+
+This repository represents the second step of the series. It keeps SQL queries explicit, but replaces manual application wiring and low-level JDBC infrastructure with Spring Boot features.
+
+It demonstrates:
+
+* Spring Boot application configuration for a console application.
+* Spring JDBC persistence with `NamedParameterJdbcTemplate`.
+* DAO classes that keep SQL queries visible and explicit.
+* Spring-managed dependency injection instead of manual object wiring.
+* Transaction management through Spring annotations.
+* Spring data access exception handling through the `DataAccessException` model.
+* PostgreSQL schema management through Flyway migrations.
+* Connection pooling through HikariCP.
+* Integration testing with Spring Test and Testcontainers.
+* Dockerized runtime setup and GitHub Actions CI/CD.
