@@ -18,8 +18,23 @@ The persistence layer uses Spring JDBC through `NamedParameterJdbcTemplate`, so 
 
 For background on the Spring JDBC approach, see the Baeldung guide: [Spring JDBC and JdbcTemplate](https://www.baeldung.com/spring-jdbc-jdbctemplate).
 
----
+<details>
+<summary><h2>Features</h2></summary>
 
+The service and DAO layers support the core school-management operations for groups, students, courses, and student-course enrollments.
+
+The console UI exposes the following user-facing actions:
+
+- Find all groups with a student count less than or equal to a given number.
+- List all students enrolled in a course by course name.
+- Add a new student.
+- Delete a student by student ID.
+- Assign a student to a course.
+- Remove a student from one of their courses.
+
+</details>
+
+---
 <details open>
 <summary><h2>Technology Stack</h2></summary>
 
@@ -40,19 +55,58 @@ This project keeps SQL queries explicit, but moves application wiring, connectio
 
 </details>
 
-<details>
-<summary><h2>Features</h2></summary>
+````markdown
+---
 
-The service and DAO layers support the core school-management operations for groups, students, courses, and student-course enrollments.
+<details open>
+<summary><h2>Application Structure</h2></summary>
 
-The console UI exposes the following user-facing actions:
+This diagram shows the main structural blocks of the Spring Boot JDBC version.  
+It highlights how the project moves application wiring and infrastructure management into Spring while keeping SQL-based persistence explicit.
 
-- Find all groups with a student count less than or equal to a given number.
-- List all students enrolled in a course by course name.
-- Add a new student.
-- Delete a student by student ID.
-- Assign a student to a course.
-- Remove a student from one of their courses.
+![School Application Spring application structure](docs/diagrams/application-structure.svg)
+
+The PlantUML source for this diagram is stored in:
+
+```text
+docs/diagrams/application-structure.puml
+````
+
+The rendered SVG diagram is stored in:
+
+```text
+docs/diagrams/application-structure.svg
+```
+
+</details>
+
+---
+
+<details open>
+<summary><h2>Database Schema</h2></summary>
+
+The application uses a simple school-management database schema with academic groups, students, courses, and a many-to-many relation between students and courses.
+
+![School Application Spring database schema](docs/diagrams/database-schema.svg)
+
+| Table              | Purpose                                  | Seed data                                  |
+| ------------------ | ---------------------------------------- | ------------------------------------------ |
+| `groups`           | Stores academic groups                   | 10 random groups, IDs start from `100`     |
+| `students`         | Stores students assigned to groups       | 200 random students, IDs start from `1000` |
+| `courses`          | Stores available courses                 | 10 predefined courses, IDs start from `10` |
+| `students_courses` | Join table for student-course enrollment | Each student gets 1–3 random courses       |
+
+The PlantUML source for this diagram is stored in:
+
+```text
+docs/diagrams/database-schema.puml
+```
+
+The rendered SVG diagram is stored in:
+
+```text
+docs/diagrams/database-schema.svg
+```
 
 </details>
 
